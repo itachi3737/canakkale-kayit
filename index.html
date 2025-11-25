@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Çanakkale Kayıt</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;500;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+
+    <style>
+        :root { --primary-gold: #c5a059; --dark-bg: #111111; --text-light: #f5f5f5; }
+        body {
+            font-family: 'Manrope', sans-serif; margin: 0; padding: 0; min-height: 100vh;
+            display: flex; align-items: center; justify-content: center;
+            background-color: var(--dark-bg);
+            background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.8)), url('https://upload.wikimedia.org/wikipedia/commons/3/3a/Canakkale_Martyrs_Memorial.jpg');
+            background-size: cover; background-position: center; background-attachment: fixed;
+            color: var(--text-light); overflow-x: hidden;
+        }
+        .glass-panel {
+            background: rgba(20, 20, 20, 0.9); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            width: 100%; max-width: 450px; padding: 40px 30px; border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 30px 60px rgba(0,0,0,0.6); position: relative;
+            animation: slideIn 0.8s ease-out;
+        }
+        .glass-panel::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px; background: var(--primary-gold); box-shadow: 0 0 15px var(--primary-gold); }
+        h1 { font-family: 'Playfair Display', serif; font-size: 2.5rem; text-align: center; margin: 0 0 30px 0; color: white; letter-spacing: 2px; }
+        h1 span { color: var(--primary-gold); font-style: italic; }
+        #step-1 { display: block; } #step-2 { display: none; }
+        .selection-row { display: flex; gap: 15px; }
+        .identity-card { flex: 1; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 25px 10px; text-align: center; cursor: pointer; transition: 0.3s; border-radius: 4px; }
+        .identity-card:hover { border-color: var(--primary-gold); background: rgba(197, 160, 89, 0.15); transform: translateY(-5px); }
+        .identity-card i { font-size: 2rem; color: #888; margin-bottom: 10px; display: block; }
+        .identity-card span { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: #ccc; }
+        .identity-card:hover i, .identity-card:hover span { color: var(--primary-gold); }
+        .input-box { position: relative; margin-bottom: 20px; }
+        .input-box input { width: 100%; padding: 12px 5px; background: transparent; border: none; border-bottom: 1px solid rgba(255,255,255,0.3); color: white; font-size: 1rem; outline: none; font-family: 'Manrope', sans-serif; transition: 0.3s; }
+        .input-box input:focus { border-bottom-color: var(--primary-gold); }
+        .input-box label { position: absolute; top: 12px; left: 5px; color: rgba(255,255,255,0.5); pointer-events: none; transition: 0.3s; font-size: 1rem; }
+        .input-box input:focus ~ label, .input-box input:valid ~ label { top: -10px; left: 0; font-size: 0.75rem; color: var(--primary-gold); }
+        .btn-gold { width: 100%; padding: 15px; background: var(--primary-gold); color: #000; border: none; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; transition: 0.3s; margin-top: 10px; border-radius: 4px; }
+        .btn-gold:hover { background: white; }
+        .back-text { text-align: center; margin-top: 15px; color: #666; cursor: pointer; font-size: 0.9rem; }
+        .back-text:hover { color: var(--primary-gold); }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<div class="glass-panel">
+    <div class="header-content">
+        <h1><span>Çanakkale</span></h1>
+    </div>
+
+    <div id="step-1">
+        <div class="selection-row">
+            <div class="identity-card" onclick="goToStep2('Erkek')">
+                <i class="fas fa-male"></i><span>Erkek</span>
+            </div>
+            <div class="identity-card" onclick="goToStep2('Kadın')">
+                <i class="fas fa-female"></i><span>Kadın</span>
+            </div>
+        </div>
+        <p style="text-align:center; color:#555; margin-top:25px; font-size:0.8rem;">Devam etmek için seçim yapınız</p>
+    </div>
+
+    <div id="step-2">
+        <form id="geziForm">
+            <input type="hidden" name="Tarih" id="tarih">
+            <input type="hidden" name="Grup" id="hidden-gender">
+
+            <div class="input-box"><input type="text" name="AdSoyad" required autocomplete="off"><label>Ad Soyad</label></div>
+            <div class="input-box"><input type="text" name="TCNo" maxlength="11" required autocomplete="off"><label>TC Kimlik No</label></div>
+            <div class="input-box"><input type="text" name="OkulNo" required autocomplete="off"><label>Okul No</label></div>
+            <div class="input-box"><input type="tel" name="Telefon" id="phone" required autocomplete="off"><label>Telefon</label></div>
+            <div class="input-box"><input type="text" name="Bolum" required autocomplete="off"><label>Bölüm Adı</label></div>
+
+            <button type="submit" class="btn-gold" id="btnSubmit">KAYDI TAMAMLA</button>
+            <div class="back-text" onclick="goToStep1()">← Geri Dön</div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // --- LINKIN BURADA REIS ---
+    const API_URL = "https://sheetdb.io/api/v1/vj907vlb69wb9"; 
+
+    $(document).ready(function(){ $('#phone').mask('(000) 000 00 00'); });
+
+    function goToStep2(gender) {
+        document.getElementById('hidden-gender').value = gender;
+        document.getElementById('step-1').style.display = 'none';
+        document.getElementById('step-2').style.display = 'block';
+    }
+
+    function goToStep1() {
+        document.getElementById('step-2').style.display = 'none';
+        document.getElementById('step-1').style.display = 'block';
+    }
+
+    const form = document.getElementById('geziForm');
+    form.addEventListener('submit', e => {
+        e.preventDefault();
+
+        // 1. Sayfa Seçimi (Erkekler mi Kizlar mi?)
+        const cinsiyet = document.getElementById('hidden-gender').value;
+        let hedefSayfa = "";
+        
+        if (cinsiyet === 'Erkek') {
+            hedefSayfa = "Erkekler"; // Excel'deki sayfa adı
+        } else {
+            hedefSayfa = "Kizlar";   // Excel'deki sayfa adı
+        }
+
+        // Linkin sonuna sayfa adını ekle
+        const finalLink = API_URL + "?sheet=" + hedefSayfa;
+
+        // 2. Tarih Ekleme
+        const now = new Date();
+        document.getElementById('tarih').value = now.toLocaleString('tr-TR');
+
+        // 3. Butonu Kilitleme
+        const btn = document.getElementById('btnSubmit');
+        const oldText = btn.innerText;
+        btn.innerText = "Kaydediliyor...";
+        btn.disabled = true;
+
+        // 4. Gönderme İşlemi
+        fetch(finalLink, { method: 'POST', body: new FormData(form) })
+        .then(response => {
+            Swal.fire({
+                background: '#222', color: '#fff', 
+                title: 'Kayıt Yapıldı', 
+                text: 'Bilgiler başarıyla eklendi.', 
+                icon: 'success', confirmButtonColor: '#c5a059', confirmButtonText: 'Tamam'
+            }).then(() => { location.reload(); });
+        })
+        .catch(error => {
+            console.error(error);
+            Swal.fire('Hata', 'Bağlantı sorunu var reis, sayfayı yenileyip tekrar dene.', 'error');
+            btn.innerText = oldText;
+            btn.disabled = false;
+        });
+    });
+</script>
+
+</body>
+</html>
