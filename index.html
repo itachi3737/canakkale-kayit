@@ -105,7 +105,7 @@
 </div>
 
 <script>
-    // --- LİNKİNİZ ---
+    // --- API LINKINIZ ---
     const API_URL = "https://sheetdb.io/api/v1/9bpbbme0n3b93"; 
 
     $(document).ready(function(){ 
@@ -114,12 +114,12 @@
 
         // SADECE SAYI GİRME KURALI (TC ve Okul No için)
         $('#tcno, #okulno').on('input', function() {
-            this.value = this.value.replace(/[^0-9]/g, ''); // Sayı olmayan her şeyi sil
+            this.value = this.value.replace(/[^0-9]/g, ''); 
         });
 
         // SADECE HARF GİRME KURALI (Ad Soyad için)
         $('#adsoyad').on('input', function() {
-            this.value = this.value.replace(/[^a-zA-ZğüşıöçĞÜŞİÖÇ\s]/g, ''); // Harf ve boşluk dışını sil
+            this.value = this.value.replace(/[^a-zA-ZğüşıöçĞÜŞİÖÇ\s]/g, ''); 
         });
     });
 
@@ -163,12 +163,16 @@
             if (!response.ok || (cevap && cevap.error)) {
                 throw new Error(cevap.error || "Sunucu hatası");
             }
+            
+            // --- BURASI DEĞİŞTİ ---
             Swal.fire({
                 background: '#222', color: '#fff', 
                 title: 'Kayıt Başarılı!', 
-                text: 'Veriler E-Tabloya eklendi.', 
+                text: 'Başvurunuz alınmıştır, teşekkür ederiz.', 
                 icon: 'success', confirmButtonColor: '#c5a059'
             }).then(() => { location.reload(); });
+            // ---------------------
+
         })
         .catch(error => {
             console.error(error);
