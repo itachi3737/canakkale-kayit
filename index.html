@@ -86,7 +86,7 @@
 </div>
 
 <script>
-    // --- LINKIN BURADA REIS ---
+    // --- LİNKİN ZATEN BURADA (DOKUNMA) ---
     const API_URL = "https://sheetdb.io/api/v1/vj907vlb69wb9"; 
 
     $(document).ready(function(){ $('#phone').mask('(000) 000 00 00'); });
@@ -106,42 +106,52 @@
     form.addEventListener('submit', e => {
         e.preventDefault();
 
-        // 1. Sayfa Seçimi (Erkekler mi Kizlar mi?)
         const cinsiyet = document.getElementById('hidden-gender').value;
         let hedefSayfa = "";
         
+        // E-Tablo'daki sayfa isminin aynısı olmalı
         if (cinsiyet === 'Erkek') {
-            hedefSayfa = "Erkekler"; // Excel'deki sayfa adı
+            hedefSayfa = "Erkekler"; 
         } else {
-            hedefSayfa = "Kizlar";   // Excel'deki sayfa adı
+            hedefSayfa = "Kizlar";
         }
 
-        // Linkin sonuna sayfa adını ekle
         const finalLink = API_URL + "?sheet=" + hedefSayfa;
 
-        // 2. Tarih Ekleme
         const now = new Date();
         document.getElementById('tarih').value = now.toLocaleString('tr-TR');
 
-        // 3. Butonu Kilitleme
         const btn = document.getElementById('btnSubmit');
         const oldText = btn.innerText;
-        btn.innerText = "Kaydediliyor...";
+        btn.innerText = "Bağlanıyor...";
         btn.disabled = true;
 
-        // 4. Gönderme İşlemi
         fetch(finalLink, { method: 'POST', body: new FormData(form) })
-        .then(response => {
+        .then(async response => {
+            const cevap = await response.json();
+            
+            // Hata varsa yakala
+            if (!response.ok || (cevap && cevap.error)) {
+                throw new Error(cevap.error || "Sunucu hatası");
+            }
+
+            // Başarılıysa
             Swal.fire({
                 background: '#222', color: '#fff', 
-                title: 'Kayıt Yapıldı', 
-                text: 'Bilgiler başarıyla eklendi.', 
-                icon: 'success', confirmButtonColor: '#c5a059', confirmButtonText: 'Tamam'
+                title: 'Kayıt Başarılı!', 
+                text: 'Veriler E-Tabloya eklendi.', 
+                icon: 'success', confirmButtonColor: '#c5a059'
             }).then(() => { location.reload(); });
         })
         .catch(error => {
             console.error(error);
-            Swal.fire('Hata', 'Bağlantı sorunu var reis, sayfayı yenileyip tekrar dene.', 'error');
+            // HATAYI EKRANA BAS
+            Swal.fire({
+                title: 'Hata Oluştu!', 
+                text: 'Sebep: ' + error.message, 
+                icon: 'error',
+                footer: 'Büyük ihtimalle SheetDB sitesinden "Update" butonuna basmadın reis.'
+            });
             btn.innerText = oldText;
             btn.disabled = false;
         });
