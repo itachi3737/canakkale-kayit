@@ -53,7 +53,7 @@
 
 <div class="glass-panel">
     <div class="header-content">
-        <h1><span>Çanakkale Test</span></h1>
+        <h1><span>Çanakkale</span></h1>
     </div>
 
     <div id="step-1">
@@ -73,11 +73,30 @@
             <input type="hidden" name="Tarih" id="tarih">
             <input type="hidden" name="Grup" id="hidden-gender">
 
-            <div class="input-box"><input type="text" name="AdSoyad" required autocomplete="off"><label>Ad Soyad</label></div>
-            <div class="input-box"><input type="text" name="TCNo" maxlength="11" required autocomplete="off"><label>TC Kimlik No</label></div>
-            <div class="input-box"><input type="text" name="OkulNo" required autocomplete="off"><label>Okul No</label></div>
-            <div class="input-box"><input type="tel" name="Telefon" id="phone" required autocomplete="off"><label>Telefon</label></div>
-            <div class="input-box"><input type="text" name="Bolum" required autocomplete="off"><label>Bölüm Adı</label></div>
+            <div class="input-box">
+                <input type="text" name="AdSoyad" id="adsoyad" required autocomplete="off">
+                <label>Ad Soyad</label>
+            </div>
+
+            <div class="input-box">
+                <input type="tel" name="TCNo" id="tcno" maxlength="11" required autocomplete="off">
+                <label>TC Kimlik No</label>
+            </div>
+
+            <div class="input-box">
+                <input type="tel" name="OkulNo" id="okulno" required autocomplete="off">
+                <label>Okul No</label>
+            </div>
+
+            <div class="input-box">
+                <input type="tel" name="Telefon" id="phone" required autocomplete="off">
+                <label>Telefon</label>
+            </div>
+
+            <div class="input-box">
+                <input type="text" name="Bolum" required autocomplete="off">
+                <label>Bölüm Adı</label>
+            </div>
 
             <button type="submit" class="btn-gold" id="btnSubmit">KAYDI TAMAMLA</button>
             <div class="back-text" onclick="goToStep1()">← Geri Dön</div>
@@ -86,10 +105,23 @@
 </div>
 
 <script>
-    // --- YENİ LİNKİN BURADA ---
+    // --- LİNKİNİZ ---
     const API_URL = "https://sheetdb.io/api/v1/9bpbbme0n3b93"; 
 
-    $(document).ready(function(){ $('#phone').mask('(000) 000 00 00'); });
+    $(document).ready(function(){ 
+        // Telefon Maskesi
+        $('#phone').mask('(000) 000 00 00');
+
+        // SADECE SAYI GİRME KURALI (TC ve Okul No için)
+        $('#tcno, #okulno').on('input', function() {
+            this.value = this.value.replace(/[^0-9]/g, ''); // Sayı olmayan her şeyi sil
+        });
+
+        // SADECE HARF GİRME KURALI (Ad Soyad için)
+        $('#adsoyad').on('input', function() {
+            this.value = this.value.replace(/[^a-zA-ZğüşıöçĞÜŞİÖÇ\s]/g, ''); // Harf ve boşluk dışını sil
+        });
+    });
 
     function goToStep2(gender) {
         document.getElementById('hidden-gender').value = gender;
@@ -109,7 +141,6 @@
         const cinsiyet = document.getElementById('hidden-gender').value;
         let hedefSayfa = "";
         
-        // E-Tablo'daki sayfa isminin aynısı olmalı (i harfi ile)
         if (cinsiyet === 'Erkek') {
             hedefSayfa = "Erkekler"; 
         } else {
@@ -129,13 +160,9 @@
         fetch(finalLink, { method: 'POST', body: new FormData(form) })
         .then(async response => {
             const cevap = await response.json();
-            
-            // Hata Kontrolü
             if (!response.ok || (cevap && cevap.error)) {
                 throw new Error(cevap.error || "Sunucu hatası");
             }
-
-            // Başarılı
             Swal.fire({
                 background: '#222', color: '#fff', 
                 title: 'Kayıt Başarılı!', 
